@@ -6,6 +6,7 @@
 #include "test_manager.h"
 #include "analyzer.h"
 #include "reporter.h"
+#include "config.h"
 
 int main(int argc, char* argv[]) {
 
@@ -52,8 +53,11 @@ int main(int argc, char* argv[]) {
     // =========================
 
     else if (command == "build") {
+        BuildGuardConfig config;
 
-        buildProject(projectPath);
+        loadConfig(projectPath, config);
+
+        buildProject(projectPath, config);
     }
 
 
@@ -62,9 +66,12 @@ int main(int argc, char* argv[]) {
     // =========================
 
     else if (command == "test") {
+        BuildGuardConfig config;
 
-        runTests(projectPath);
-    }
+        loadConfig(projectPath, config);
+
+        runTests(projectPath, config);
+}
 
 
     // =========================
@@ -82,11 +89,15 @@ int main(int argc, char* argv[]) {
     // =========================
 
     else if (command == "report") {
+        BuildGuardConfig config;
+
+        loadConfig(projectPath, config);
 
         BuildError buildError = analyzeBuild(projectPath);
 
-        generateReport(projectPath, buildError);
-    }
+        generateReport(projectPath, buildError, config);
+}
+
 
 
     // =========================

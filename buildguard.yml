@@ -3,7 +3,7 @@ project:
 
 build:
   system: cmake
-  generator: ninja
+  generator: Ninja
   build_type: Release
 
 test:

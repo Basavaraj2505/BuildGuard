@@ -3,6 +3,11 @@
 
 #include <string>
 
-bool runTests(const std::string& projectPath);
+#include "config.h"
+
+bool runTests(
+    const std::string& projectPath,
+    const BuildGuardConfig& config
+);
 
 #endif
