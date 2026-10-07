@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+find_package(yaml-cpp REQUIRED)
 add_executable(buildguard
     src/main.cpp
     src/scanner.cpp
@@ -17,8 +18,10 @@ add_executable(buildguard
     src/test_manager.cpp
     src/analyzer.cpp
 src/reporter.cpp
+src/config.cpp
 
 )
+target_link_libraries(buildguard PRIVATE yaml-cpp::yaml-cpp)
 enable_testing()
 
 add_test(

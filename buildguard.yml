@@ -1,0 +1,14 @@
+project:
+  name: BuildGuard
+
+build:
+  system: cmake
+  generator: ninja
+  build_type: Release
+
+test:
+  enabled: true
+
+report:
+  format: json
+  output: reports/buildguard_report.json
