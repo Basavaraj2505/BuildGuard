@@ -1,5 +1,4 @@
 #include "reporter.h"
-#include "config.h"
 
 #include <filesystem>
 #include <fstream>
@@ -8,7 +7,10 @@
 
 namespace fs = std::filesystem;
 
-void generateReport(const std::string& projectPath) {
+void generateReport(
+    const std::string& projectPath,
+    const BuildError& buildError
+) {
 
     std::cout << "\n=================================\n";
     std::cout << "       BuildGuard Report\n";
@@ -22,47 +24,23 @@ void generateReport(const std::string& projectPath) {
         return;
     }
 
-    // =========================
-    // LOAD CONFIGURATION
-    // =========================
+    fs::path reportDirectory =
+        project / "reports";
 
-    BuildGuardConfig config;
-
-    if (!loadConfig(projectPath, config)) {
-
-        std::cout
-            << "[REPORT] Using default configuration.\n";
+    if (!fs::exists(reportDirectory)) {
+        fs::create_directory(reportDirectory);
     }
-
-    // =========================
-    // REPORT OUTPUT
-    // =========================
 
     fs::path reportFile =
-        project / config.reportOutput;
-
-    fs::path reportDirectory =
-        reportFile.parent_path();
-
-    if (!reportDirectory.empty() &&
-        !fs::exists(reportDirectory)) {
-
-        fs::create_directories(reportDirectory);
-    }
+        reportDirectory / "buildguard_report.json";
 
     std::ofstream file(reportFile);
 
     if (!file.is_open()) {
 
-        std::cout
-            << "\n[ERROR] Could not create report file.\n";
-
+        std::cout << "\n[ERROR] Could not create report file.\n";
         return;
     }
-
-    // =========================
-    // PROJECT STRUCTURE
-    // =========================
 
     bool hasCMake =
         fs::exists(project / "CMakeLists.txt");
@@ -79,39 +57,32 @@ void generateReport(const std::string& projectPath) {
     bool hasGithub =
         fs::is_directory(project / ".github");
 
-    // =========================
-    // JSON REPORT
-    // =========================
+    bool buildSuccess =
+        buildError.type == ErrorType::NONE;
 
     file << "{\n";
 
-    file << "  \"project\": \""
-         << config.projectName
+    file << "  \"project\": \"BuildGuard\",\n";
+
+    file << "  \"build_status\": \""
+         << (buildSuccess ? "SUCCESS" : "FAILED")
          << "\",\n";
 
-    file << "  \"build_status\": \"SUCCESS\",\n";
+    file << "  \"error_type\": \""
+         << errorTypeToString(buildError.type)
+         << "\",\n";
 
-    file << "  \"tests\": \""
-         << (config.testsEnabled ? "PASSED" : "DISABLED")
+    file << "  \"error_message\": \""
+         << buildError.message
          << "\",\n";
 
     file << "  \"compiler\": \"GCC\",\n";
 
-    file << "  \"build_system\": \""
-         << config.buildSystem
-         << " + "
-         << config.generator
-         << "\",\n";
-
-    file << "  \"build_type\": \""
-         << config.buildType
-         << "\",\n";
+    file << "  \"build_system\": \"CMake + Ninja\",\n";
 
     file << "  \"language\": \"C++17\",\n";
 
-    file << "  \"report_format\": \""
-         << config.reportFormat
-         << "\",\n";
+    file << "  \"report_format\": \"json\",\n";
 
     file << "  \"structure\": {\n";
 
@@ -137,17 +108,19 @@ void generateReport(const std::string& projectPath) {
 
     file << "  },\n";
 
-    file << "  \"health_score\": 100\n";
+    int healthScore = buildSuccess ? 100 : 0;
+
+    file << "  \"health_score\": "
+         << healthScore
+         << "\n";
 
     file << "}\n";
 
     file.close();
 
-    std::cout
-        << "\n[REPORT] JSON report generated.\n";
+    std::cout << "\n[REPORT] JSON report generated.\n";
 
-    std::cout
-        << "Location: "
-        << reportFile
-        << "\n";
+    std::cout << "Location: "
+              << reportFile
+              << "\n";
 }

@@ -86,7 +86,7 @@ std::string errorTypeToString(ErrorType type) {
 }
 
 
-void analyzeBuild(const std::string& projectPath) {
+BuildError analyzeBuild(const std::string& projectPath) {
 
     std::cout << "\n=================================\n";
     std::cout << "       BuildGuard Analysis\n";
@@ -102,7 +102,10 @@ void analyzeBuild(const std::string& projectPath) {
         std::cout << "\n[ERROR] Build directory does not exist.\n";
         std::cout << "Run CMake configuration first.\n";
 
-        return;
+        return {
+            ErrorType::UNKNOWN_ERROR,
+            "Build directory does not exist."
+        };
     }
 
     std::cout << "\n[ANALYZE] Running CMake build...\n\n";
@@ -118,12 +121,16 @@ void analyzeBuild(const std::string& projectPath) {
 
         std::cout << "\n[ERROR] Could not start build process.\n";
 
-        return;
+        return {
+            ErrorType::UNKNOWN_ERROR,
+            "Could not start build process."
+        };
     }
 
     char buffer[512];
 
     bool buildFailed = false;
+
     BuildError detectedError{
         ErrorType::NONE,
         ""
@@ -159,7 +166,10 @@ void analyzeBuild(const std::string& projectPath) {
 
         std::cout << "\nNo build errors detected.\n";
 
-        return;
+        return {
+            ErrorType::NONE,
+            ""
+        };
     }
 
     std::cout << "          BUILD FAILED\n";
@@ -176,10 +186,15 @@ void analyzeBuild(const std::string& projectPath) {
         std::cout << "Message: "
                   << detectedError.message;
 
-    } else {
-
-        std::cout << "\n[ERROR CLASSIFICATION]\n";
-        std::cout << "Type: UNKNOWN_ERROR\n";
-        std::cout << "Could not classify the build error.\n";
+        return detectedError;
     }
+
+    std::cout << "\n[ERROR CLASSIFICATION]\n";
+    std::cout << "Type: UNKNOWN_ERROR\n";
+    std::cout << "Could not classify the build error.\n";
+
+    return {
+        ErrorType::UNKNOWN_ERROR,
+        "Could not classify the build error."
+    };
 }

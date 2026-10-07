@@ -17,7 +17,7 @@ struct BuildError {
     std::string message;
 };
 
-void analyzeBuild(const std::string& projectPath);
+BuildError analyzeBuild(const std::string& projectPath);
 
 BuildError classifyError(const std::string& line);
 

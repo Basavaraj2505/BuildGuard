@@ -81,10 +81,11 @@ int main(int argc, char* argv[]) {
     // REPORT
     // =========================
 
-else if (command == "report") {
+    else if (command == "report") {
 
-    generateReport(projectPath);
+        BuildError buildError = analyzeBuild(projectPath);
 
+        generateReport(projectPath, buildError);
     }
 
 
