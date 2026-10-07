@@ -129,10 +129,12 @@ test:
   enabled: false
 
 BuildGuard skips test execution.
+
 4. Analyze a Build
 ./build/buildguard analyze .
 
 BuildGuard runs the build process and analyzes the compiler/build output to identify common build errors.
+
 5. Generate a JSON Report
 ./build/buildguard report .
 
@@ -244,7 +246,7 @@ GitHub Actions
        ↓
 CI Validation
 
-Technologies Used
+Technologies Used:
 Category	Technology
 Language	C++17
 Build System	CMake
@@ -276,7 +278,7 @@ Key Software Engineering Concepts Demonstrated
 - Developer tooling
 
 
-Future Improvements
+Future Improvements:
 Potential future improvements include:
 - More detailed health-score calculation
 - Additional compiler error patterns
